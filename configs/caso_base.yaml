@@ -1,0 +1,34 @@
+GENERAL:
+  sim_name: "MVP_1D_Imp"
+  model_dim: 1
+  final_time: 3600.0        # 1 hora
+  time_step_dt: 1.0
+  time_scheme: "implicito"
+
+GRID:
+  length_y: 0.003        # 3 mm total (vidro + célula + backsheet “equivalente”)
+  nodes_y: 30
+
+
+BOUNDARY_CONDITIONS:
+  ambient_temp_K: 298.15
+  irradiance_G: 1000.0
+  h_top: 10.0
+  h_bottom: 10.0
+  epsilon_top: 0.85
+  epsilon_bottom: 0.85
+
+
+PV_CELL:
+  ref_efficiency: 0.20
+  temp_coeff_beta: 0.004
+  ref_temp_K: 298.15
+  absorbing_thickness: 0.0002   # 200 µm de célula gerando calor
+
+
+# painel equivalente realista
+MATERIAL:
+  k: 2.0
+  rho: 2500
+  cp: 800
+

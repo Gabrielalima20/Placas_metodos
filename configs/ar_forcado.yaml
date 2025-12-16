@@ -1,0 +1,29 @@
+GENERAL:
+  sim_name: "Resfriamento_Ar_Forcado_1D"
+  model_dim: 1
+  final_time: 3600.0
+  time_step_dt: 1.0
+  time_scheme: "implicito"
+
+GRID:
+  length_y: 0.003
+  nodes_y: 30
+
+BOUNDARY_CONDITIONS:
+  ambient_temp_K: 298.15     # 25 °C
+  irradiance_G: 1000.0       # irradiância padrão
+  h_top: 60.0                # ventilador / vento moderado
+  h_bottom: 40.0             # circulação de ar por baixo
+  epsilon_top: 0.85
+  epsilon_bottom: 0.85
+
+PV_CELL:
+  ref_efficiency: 0.20
+  temp_coeff_beta: 0.004
+  ref_temp_K: 298.15
+  absorbing_thickness: 0.0002
+
+MATERIAL:
+  k: 2.0
+  rho: 2500
+  cp: 800

@@ -1,0 +1,29 @@
+GENERAL:
+  sim_name: "Resfriamento_Passivo_1D"
+  model_dim: 1
+  final_time: 3600.0
+  time_step_dt: 1.0
+  time_scheme: "implicito"
+
+GRID:
+  length_y: 0.003
+  nodes_y: 30
+
+BOUNDARY_CONDITIONS:
+  ambient_temp_K: 298.15
+  irradiance_G: 1000.0
+  h_top: 25.0              # vento leve ou aletas
+  h_bottom: 20.0
+  epsilon_top: 0.90        # superfície com alta emissividade
+  epsilon_bottom: 0.90
+
+PV_CELL:
+  ref_efficiency: 0.20
+  temp_coeff_beta: 0.004
+  ref_temp_K: 298.15
+  absorbing_thickness: 0.0002
+
+MATERIAL:
+  k: 2.0
+  rho: 2500
+  cp: 800
