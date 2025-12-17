@@ -23,7 +23,7 @@ def rodar_simulacao(sim: SimulationConfig):
     """Calcula parâmetros derivados e executa a simulação 1D."""
     sim = _ajustar_dt_para_explicito(sim)
     params = calcular_parametros(sim)
-    times, T_hist, eta_hist, _ = rodar_simulacao_1d(sim, params)
+    times, T_hist, eta_hist, _, _ = rodar_simulacao_1d(sim, params)
 
     t_min = times / 60.0
     T_C = T_hist - 273.15

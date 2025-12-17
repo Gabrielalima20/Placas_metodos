@@ -24,7 +24,7 @@ def rodar_caso(label: str, cfg_path: str):
     sim = carregar_config_yaml(cfg_path)
     params = calcular_parametros(sim)
 
-    times, T_hist, eta_hist, _ = rodar_simulacao_1d(sim, params)
+    times, T_hist, eta_hist, _, _ = rodar_simulacao_1d(sim, params)
 
     # converter para unidades “bonitas”
     t_min = times / 60.0            # s -> min

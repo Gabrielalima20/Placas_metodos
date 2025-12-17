@@ -4,7 +4,7 @@ import time
 from .configuracoes import carregar_config_yaml
 from .parametros import calcular_parametros
 from .fisica.solver_1d import rodar_simulacao_1d
-from .visualizacao import plot_results
+from .visualizacao import plot_results, plot_temperature_map
 
 
 def main(config_path: str):
@@ -14,10 +14,11 @@ def main(config_path: str):
     print(f"Iniciando simulação: {sim.sim_name}")
     t0 = time.time()
 
-    times, T_hist, eta_hist, T_final = rodar_simulacao_1d(sim, params)
+    times, T_hist, eta_hist, T_final, T_profiles = rodar_simulacao_1d(sim, params)
 
     print(f"Simulação concluída em {time.time() - t0:.2f} s")
     plot_results(times, T_hist, eta_hist, T_final, sim)
+    plot_temperature_map(times, T_profiles, sim)
 
 
 if __name__ == "__main__":

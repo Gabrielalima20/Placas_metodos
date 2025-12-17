@@ -24,6 +24,11 @@ significa que o pacote `pyyaml` não foi instalado; o passo acima resolve.
 
 Ajuste `configs/*.yaml` para alterar propriedades ou o método temporal.
 
+Ao final de cada execução, dois arquivos são gerados na pasta `resultados/`:
+- `resultado_<nome>.png`: médias de temperatura/eficiência e perfil final.
+- `mapa_temperatura_<nome>.png`: mapa tempo × espessura (heatmap) mostrando a
+  evolução de temperatura em toda a placa.
+
 ### Comparar explícito vs. implícito
 Para gerar um gráfico comparando o perfil de temperatura e a eficiência obtidos
 pelos dois esquemas temporais no mesmo caso base:

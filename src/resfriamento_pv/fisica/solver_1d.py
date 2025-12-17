@@ -155,10 +155,11 @@ def rodar_simulacao_1d(sim: SimulationConfig, params: ParametrosDerivados):
     Loop temporal completo 1D.
 
     Retorna:
-      times          : array de tempos [s]
-      T_history      : temperatura média da placa ao longo do tempo [K]
-      eta_history    : eficiência média da célula ao longo do tempo [-]
-      T_final        : perfil final de temperatura na espessura [K]
+      times             : array de tempos [s]
+      T_history         : temperatura média da placa ao longo do tempo [K]
+      eta_history       : eficiência média da célula ao longo do tempo [-]
+      T_final           : perfil final de temperatura na espessura [K]
+      T_profile_history : evolução espacial completa (shape = n_steps x nz) [K]
     """
     Ny = sim.dominio.nz
 
@@ -168,6 +169,7 @@ def rodar_simulacao_1d(sim: SimulationConfig, params: ParametrosDerivados):
     history_time = []
     history_T_avg = []
     history_eta_avg = []
+    history_profiles = np.empty((params.n_steps, Ny))
 
     current_time = 0.0
 
@@ -190,10 +192,12 @@ def rodar_simulacao_1d(sim: SimulationConfig, params: ParametrosDerivados):
         history_time.append(current_time)
         history_T_avg.append(T_avg)
         history_eta_avg.append(eta_avg)
+        history_profiles[step] = T
 
     return (
         np.array(history_time),
         np.array(history_T_avg),
         np.array(history_eta_avg),
         T,
+        history_profiles,
     )

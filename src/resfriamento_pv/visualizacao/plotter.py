@@ -38,3 +38,38 @@ def plot_results(times, T_history, eta_history, T_profile, sim: SimulationConfig
     plt.savefig(f"resultados/resultado_{sim_name}.png", dpi=200)
     print(f"Gráfico salvo em resultados/resultado_{sim_name}.png")
     plt.show()
+
+
+def plot_temperature_map(times, T_profile_history, sim: SimulationConfig):
+    """Cria um mapa tempo x espessura da temperatura (°C)."""
+
+    if T_profile_history is None or len(T_profile_history) == 0:
+        return
+
+    times = np.array(times)
+    T_profile_history = np.array(T_profile_history)
+
+    times_min = times / 60.0
+    depth_mm = np.linspace(0, sim.dominio.L * 1000, T_profile_history.shape[1])
+    temp_C = T_profile_history - 273.15
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    mesh = ax.pcolormesh(
+        depth_mm,
+        times_min,
+        temp_C,
+        shading="auto",
+        cmap="inferno",
+    )
+    cbar = plt.colorbar(mesh, ax=ax)
+    cbar.set_label("Temperatura (°C)")
+
+    ax.set_title("Mapa de temperatura na espessura")
+    ax.set_xlabel("Posição na espessura (mm)")
+    ax.set_ylabel("Tempo (min)")
+
+    plt.tight_layout()
+    out_path = f"resultados/mapa_temperatura_{sim.sim_name}.png"
+    plt.savefig(out_path, dpi=200)
+    print(f"Mapa de temperatura salvo em {out_path}")
+    plt.show()
