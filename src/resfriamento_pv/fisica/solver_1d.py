@@ -85,15 +85,81 @@ def solve_implicit_step(
     return T_new
 
 
+def solve_explicit_step(
+    T_n: np.ndarray,
+    sim: SimulationConfig,
+    params: ParametrosDerivados,
+) -> np.ndarray:
+    """
+    Avança um passo de tempo usando esquema explícito (Forward Euler)
+    com convecção + radiação tratadas explicitamente nas faces.
+    """
+    rho = sim.material.rho
+    cp = sim.material.cp
+    T_inf = sim.cc.T_inf
+
+    dz = params.dz
+    Fo = params.Fo
+    Bi_top = params.Bi_top
+    Bi_bottom = params.Bi_bottom
+
+    Ny = len(T_n)
+
+    sigma_sb = 5.670374419e-8  # Stefan-Boltzmann
+    eps_top = sim.cc.epsilon_top
+    eps_bottom = sim.cc.epsilon_bottom
+
+    T_bottom = T_n[0]
+    T_top = T_n[-1]
+
+    q_rad_bottom = eps_bottom * sigma_sb * (T_bottom**4 - T_inf**4)  # W/m²
+    q_rad_top = eps_top * sigma_sb * (T_top**4 - T_inf**4)  # W/m²
+
+    rad_term_bottom = q_rad_bottom * sim.dt / (rho * cp * dz)
+    rad_term_top = q_rad_top * sim.dt / (rho * cp * dz)
+
+    q_dot = calculate_heat_generation(T_n, sim)  # W/m³
+    source_term = q_dot * sim.dt / (rho * cp)
+
+    T_new = np.empty_like(T_n)
+
+    # Nós internos
+    for i in range(1, Ny - 1):
+        T_new[i] = (
+            T_n[i]
+            + Fo * (T_n[i + 1] - 2.0 * T_n[i] + T_n[i - 1])
+            + source_term[i]
+        )
+
+    # Borda inferior (y=0)
+    T_new[0] = (
+        T_n[0]
+        + 2.0 * Fo * (T_n[1] - T_n[0] * (1.0 + Bi_bottom) + Bi_bottom * T_inf)
+        - rad_term_bottom
+        + source_term[0]
+    )
+
+    # Borda superior (y=L)
+    T_new[-1] = (
+        T_n[-1]
+        + 2.0 * Fo * (T_n[-2] - T_n[-1] * (1.0 + Bi_top) + Bi_top * T_inf)
+        - rad_term_top
+        + source_term[-1]
+    )
+
+    return T_new
+
+
 def rodar_simulacao_1d(sim: SimulationConfig, params: ParametrosDerivados):
     """
     Loop temporal completo 1D.
 
     Retorna:
-      times          : array de tempos [s]
-      T_history      : temperatura média da placa ao longo do tempo [K]
-      eta_history    : eficiência média da célula ao longo do tempo [-]
-      T_final        : perfil final de temperatura na espessura [K]
+      times             : array de tempos [s]
+      T_history         : temperatura média da placa ao longo do tempo [K]
+      eta_history       : eficiência média da célula ao longo do tempo [-]
+      T_final           : perfil final de temperatura na espessura [K]
+      T_profile_history : evolução espacial completa (shape = n_steps x nz) [K]
     """
     Ny = sim.dominio.nz
 
@@ -103,11 +169,21 @@ def rodar_simulacao_1d(sim: SimulationConfig, params: ParametrosDerivados):
     history_time = []
     history_T_avg = []
     history_eta_avg = []
+    history_profiles = np.empty((params.n_steps, Ny))
 
     current_time = 0.0
 
+    if sim.metodo_tempo == "implicito":
+        stepper = solve_implicit_step
+    elif sim.metodo_tempo == "explicito":
+        stepper = solve_explicit_step
+    else:
+        raise NotImplementedError(
+            f"Método de tempo '{sim.metodo_tempo}' ainda não implementado."
+        )
+
     for step in range(params.n_steps):
-        T = solve_implicit_step(T, sim, params)
+        T = stepper(T, sim, params)
         current_time += sim.dt
 
         T_avg = T.mean()
@@ -116,10 +192,12 @@ def rodar_simulacao_1d(sim: SimulationConfig, params: ParametrosDerivados):
         history_time.append(current_time)
         history_T_avg.append(T_avg)
         history_eta_avg.append(eta_avg)
+        history_profiles[step] = T
 
     return (
         np.array(history_time),
         np.array(history_T_avg),
         np.array(history_eta_avg),
         T,
+        history_profiles,
     )

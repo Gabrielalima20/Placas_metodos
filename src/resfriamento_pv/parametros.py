@@ -37,9 +37,10 @@ def calcular_parametros(sim: SimulationConfig) -> ParametrosDerivados:
 
     n_steps = int(sim.t_final / dt)
 
-    # Se um dia você usar esquema explícito, pode checar estabilidade aqui:
-    # if sim.metodo_tempo == "explicito" and Fo > 0.5:
-    #     raise ValueError(f"Método explícito instável: Fo={Fo:.3f} > 0.5")
+    if sim.metodo_tempo == "explicito" and Fo > 0.5:
+        raise ValueError(
+            f"Método explícito instável com Fo={Fo:.3f}; reduza dt ou aumente nz."
+        )
 
     return ParametrosDerivados(
         dz=dz,
