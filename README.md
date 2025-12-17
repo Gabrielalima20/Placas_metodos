@@ -31,3 +31,7 @@ pelos dois esquemas temporais no mesmo caso base:
 python -m src.resfriamento_pv.compare_metodos configs/caso_base.yaml
 ```
 O comando cria `resultados/comparacao_metodos.png` com as curvas lado a lado.
+Se o esquema explícito precisar de um passo de tempo menor para respeitar
+`Fo <= 0.5`, o script reduz automaticamente `dt` para o limite estável e avisa
+no terminal; para rodar apenas o solver explícito manualmente, ajuste `dt` no
+YAML conforme necessário.

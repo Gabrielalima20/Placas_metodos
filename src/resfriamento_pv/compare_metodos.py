@@ -21,6 +21,7 @@ def preparar_config(base: SimulationConfig, metodo: str) -> SimulationConfig:
 
 def rodar_simulacao(sim: SimulationConfig):
     """Calcula parâmetros derivados e executa a simulação 1D."""
+    sim = _ajustar_dt_para_explicito(sim)
     params = calcular_parametros(sim)
     times, T_hist, eta_hist, _ = rodar_simulacao_1d(sim, params)
 
@@ -28,6 +29,31 @@ def rodar_simulacao(sim: SimulationConfig):
     T_C = T_hist - 273.15
     eta_pct = eta_hist * 100.0
     return t_min, T_C, eta_pct
+
+
+def _ajustar_dt_para_explicito(sim: SimulationConfig) -> SimulationConfig:
+    """
+    Se o esquema for explícito, reduz dt automaticamente para satisfazer Fo<=0.5.
+
+    Isso evita que `compare_metodos` pare com ValueError ao usar configurações
+    pensadas para o solver implícito.
+    """
+
+    if sim.metodo_tempo != "explicito":
+        return sim
+
+    dz = sim.dominio.L / (sim.dominio.nz - 1)
+    alpha = sim.material.k / (sim.material.rho * sim.material.cp)
+    dt_limite = 0.5 * dz**2 / alpha
+
+    if sim.dt <= dt_limite:
+        return sim
+
+    print(
+        "[aviso] dt para o esquema explícito era grande demais; "
+        f"reduzindo de {sim.dt:.3e} s para {dt_limite:.3e} s para atender Fo<=0.5."
+    )
+    return replace(sim, dt=dt_limite)
 
 
 def main():
