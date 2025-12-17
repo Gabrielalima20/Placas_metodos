@@ -15,4 +15,19 @@ placa.
 ```bash
 python -m src.resfriamento_pv.main_run configs/caso_base.yaml
 ```
+Antes de rodar pela primeira vez, instale as dependências:
+```bash
+pip install -r requirements.txt
+```
+Se o comando falhar com `ModuleNotFoundError: No module named 'yaml'`,
+significa que o pacote `pyyaml` não foi instalado; o passo acima resolve.
+
 Ajuste `configs/*.yaml` para alterar propriedades ou o método temporal.
+
+### Comparar explícito vs. implícito
+Para gerar um gráfico comparando o perfil de temperatura e a eficiência obtidos
+pelos dois esquemas temporais no mesmo caso base:
+```bash
+python -m src.resfriamento_pv.compare_metodos configs/caso_base.yaml
+```
+O comando cria `resultados/comparacao_metodos.png` com as curvas lado a lado.

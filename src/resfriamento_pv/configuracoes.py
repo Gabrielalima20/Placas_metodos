@@ -1,5 +1,12 @@
 from dataclasses import dataclass
+from importlib.util import find_spec
 from typing import Literal
+
+if find_spec("yaml") is None:
+    raise ModuleNotFoundError(
+        "Dependência 'pyyaml' não encontrada. Instale com `pip install -r requirements.txt` ou `pip install pyyaml`."
+    )
+
 import yaml
 
 
